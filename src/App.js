@@ -1,15 +1,19 @@
 import "./App.css";
 import SearchBar from "./components/SearchBar";
 import CardGallery from "./components/CardGallery";
+import React, { useState } from "react";
 
-const { REACT_APP_VERSION } = process.env;
 function App() {
-  console.log({ REACT_APP_VERSION });
+  const [searchResult, setSearchResult] = useState({ data: null });
+  const handleSearchData = (data) => {
+    setSearchResult(data);
+  };
+
   return (
     <main>
-      <SearchBar />
-
-      <CardGallery />
+      {/* {console.log(searchResult)} */}
+      <SearchBar onSuccessSearch={handleSearchData} />
+      <CardGallery searchResult={searchResult} />
     </main>
   );
 }

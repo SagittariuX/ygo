@@ -11,19 +11,22 @@ const SEARCHBY = {
   "Search by Exact Name": "name",
   "Search by Archtype": "archetype",
 };
-const MAX = 50;
+const MAX = 10;
+const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
+
 
 class SearchBar extends Component {
   state = {
     searchString: "",
-    searchBy: "fname",
+    searchBy: "Search by Name",
     cardType: "All",
-    max: MAX,
+    maxReturn: MAX,
+    offset: OFFSET,
     advancedOptions: false,
-    isHidden: false,
-    isPanelBtnInside: true,
+    isHidden: true,
+    isPanelBtnInside: false,
   };
 
   render() {
@@ -51,7 +54,7 @@ class SearchBar extends Component {
             )}
           </button>
         </div>
-        <Form>
+        <Form  onSubmit={(e) => e.preventDefault()}>
           <Form.Row>
             <Col>
               <Form.Control
@@ -59,6 +62,7 @@ class SearchBar extends Component {
                 onChange={(e) =>
                   this.setState({ searchString: e.target.value })
                 }
+                onKeyUp={(e)=> this.handleEnter(e)}
               />
             </Col>
           </Form.Row>
@@ -93,6 +97,13 @@ class SearchBar extends Component {
     );
   }
 
+  //When user presses enter while focus on the search bar
+  handleEnter = (e) =>{
+    if(e.key === 'Enter'){
+      this.handleSearch();
+    }
+  }
+
   handleHiddenToggle = () => {
     this.setState({
       isHidden: !this.state.isHidden,
@@ -101,10 +112,11 @@ class SearchBar extends Component {
   };
 
   handleSearch = () => {
+    const {onSuccessSearch} = this.props;
     axios
       .get(endpointCards, { params: this.buildParam() })
-      .then((res) => console.log(res))
-      .catch((res) => console.log(res));
+      .then((res) => onSuccessSearch(res.data))
+      .catch((error) => console.log(error.response.data)); //make toast messages later
   };
 
   buildParam = () => {
@@ -114,7 +126,8 @@ class SearchBar extends Component {
 
     if (this.state.cardType !== "All") params["type"] = this.state.cardType;
 
-    params["num"] = this.state.max;
+    params["num"] = this.state.maxReturn;
+    params["offset"] = this.state.offset
 
     return params;
   };

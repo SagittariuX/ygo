@@ -1,6 +1,6 @@
 
 #search-menu{
-    width: 50vw;
+    width: 30vw;
     height: 100vh;
 
     position: fixed;
@@ -15,7 +15,7 @@
 }
 
 #search-menu.hide{
-    transform: translateX(-50vw);
+    transform: translateX(-30vw);
 }
 
 #search-menu.show{
@@ -40,7 +40,7 @@
     margin-top: 10px;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 768px) {
     #search-menu{
         width:100vw;
         padding: 10px;

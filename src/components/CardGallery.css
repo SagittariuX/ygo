@@ -1,8 +1,23 @@
 
 #card-gallery{
-    display: block;
+    display: flex;
     width: 100vw;
     min-height: 100vh;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
     background-color: red;
+}
 
+.card{
+    width: 20%;
+    max-width: 200px;
+    align-self: flex-start;
+    margin: 10px;
+}
+
+.card-title{
+    text-align: center;
 }
