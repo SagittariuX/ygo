@@ -1,9 +1,11 @@
 import axios from "axios";
 import React, { Component } from "react";
+import AsyncSelect from 'react-select/async';
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import "./SearchBar.css";
+import Select from "react-select";
 
 const CARDTYPE = ["All", "Monster", "Spell", "Trap"];
 const SEARCHBY = {
@@ -15,18 +17,19 @@ const MAX = 10;
 const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
-
+const lorem = 'https://random-word-api.herokuapp.com/word?number=20';
 
 class SearchBar extends Component {
   state = {
+    value: null,
     searchString: "",
     searchBy: "Search by Name",
     cardType: "All",
     maxReturn: MAX,
     offset: OFFSET,
     advancedOptions: false,
-    isHidden: true,
-    isPanelBtnInside: false,
+    isHidden: false,
+    isPanelBtnInside: true,
   };
 
   render() {
@@ -54,15 +57,23 @@ class SearchBar extends Component {
             )}
           </button>
         </div>
-        <Form  onSubmit={(e) => e.preventDefault()}>
+        <Form  onSubmit={(e) => console.log(e)}>
           <Form.Row>
             <Col>
-              <Form.Control
-                placeholder="Search Here..."
-                onChange={(e) =>
-                  this.setState({ searchString: e.target.value })
+              <AsyncSelect
+                placeholder="Search Here"
+                inputValue={this.state.searchString}
+                onInputChange={(str) =>
+                  this.setState({searchString: str.trim()})
                 }
-                onKeyUp={(e)=> this.handleEnter(e)}
+                onChange={str => this.setState({value: str})}
+                loadOptions={this.getOptions}
+                getOptionValue={(option) => option.value}
+                getOptionLabel={(option) => option.label}
+                cacheOptions
+                defaultOptions={
+                  [{label: 'blue', value: 1}]
+                }
               />
             </Col>
           </Form.Row>
@@ -97,19 +108,18 @@ class SearchBar extends Component {
     );
   }
 
-  //When user presses enter while focus on the search bar
-  handleEnter = (e) =>{
-    if(e.key === 'Enter'){
-      this.handleSearch();
-    }
-  }
-
   handleHiddenToggle = () => {
     this.setState({
       isHidden: !this.state.isHidden,
       isPanelBtnInside: !this.state.isPanelBtnInside,
     });
   };
+
+
+  getOptions = async(input) => {
+    return await axios(lorem).then(res => res.data);
+  };
+  
 
   handleSearch = () => {
     const {onSuccessSearch} = this.props;
