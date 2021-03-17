@@ -1,11 +1,10 @@
 import axios from "axios";
 import React, { Component } from "react";
-import AsyncSelect from 'react-select/async';
+import AsyncSelect from "react-select/async";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import "./SearchBar.css";
-import Select from "react-select";
 
 const CARDTYPE = ["All", "Monster", "Spell", "Trap"];
 const SEARCHBY = {
@@ -17,11 +16,10 @@ const MAX = 10;
 const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
-const lorem = 'https://random-word-api.herokuapp.com/word?number=20';
+const lorem = "https://random-word-api.herokuapp.com/word?number=20";
 
 class SearchBar extends Component {
   state = {
-    value: null,
     searchString: "",
     searchBy: "Search by Name",
     cardType: "All",
@@ -57,23 +55,23 @@ class SearchBar extends Component {
             )}
           </button>
         </div>
-        <Form  onSubmit={(e) => console.log(e)}>
+        <Form onSubmit={(e) => console.log(e)}>
           <Form.Row>
             <Col>
               <AsyncSelect
                 placeholder="Search Here"
                 inputValue={this.state.searchString}
-                onInputChange={(str) =>
-                  this.setState({searchString: str.trim()})
+                onInputChange={this.handleInputChange}
+                onCloseResetsInput={false}
+                onChange={(option) =>
+                  this.setState({ searchString: option.value })
                 }
-                onChange={str => this.setState({value: str})}
                 loadOptions={this.getOptions}
                 getOptionValue={(option) => option.value}
                 getOptionLabel={(option) => option.label}
                 cacheOptions
-                defaultOptions={
-                  [{label: 'blue', value: 1}]
-                }
+                blurInputOnSelect={false} //set by default, but to be sure
+                closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
               />
             </Col>
           </Form.Row>
@@ -115,14 +113,27 @@ class SearchBar extends Component {
     });
   };
 
+  getOptions = async (input) => {
+    const data = await axios(lorem).then((res) => res.data);
 
-  getOptions = async(input) => {
-    return await axios(lorem).then(res => res.data);
+    let options = [];
+    let obj;
+    for (let i = 0; i < data.length; i++) {
+      obj = {};
+      obj["value"] = data[i];
+      obj["label"] = data[i];
+      options.push(obj);
+    }
+    return options;
   };
-  
+
+  handleInputChange = (str, { action }) => {
+    if (action === "input-change" || action === "set-value")
+      this.setState({ searchString: str.trim() });
+  };
 
   handleSearch = () => {
-    const {onSuccessSearch} = this.props;
+    const { onSuccessSearch } = this.props;
     axios
       .get(endpointCards, { params: this.buildParam() })
       .then((res) => onSuccessSearch(res.data))
@@ -137,7 +148,7 @@ class SearchBar extends Component {
     if (this.state.cardType !== "All") params["type"] = this.state.cardType;
 
     params["num"] = this.state.maxReturn;
-    params["offset"] = this.state.offset
+    params["offset"] = this.state.offset;
 
     return params;
   };
