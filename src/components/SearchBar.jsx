@@ -26,8 +26,14 @@ class SearchBar extends Component {
     maxReturn: MAX,
     offset: OFFSET,
     advancedOptions: false,
+
+    //Deals with hiding the search area
     isHidden: false,
     isPanelBtnInside: true,
+
+    //Deals with AsyncSearch bar
+    typingTimeout: null,
+    options: null,
   };
 
   render() {
@@ -61,11 +67,10 @@ class SearchBar extends Component {
               <AsyncSelect
                 placeholder="Search Here"
                 inputValue={this.state.searchString}
-                onInputChange={this.handleInputChange}
+                onInputChange={this.handleOnInputChange}
                 onCloseResetsInput={false}
-                onChange={(option) =>
-                  this.setState({ searchString: option.value })
-                }
+                onChange={this.handleOnChange}
+                defaultOptions={this.state.options}
                 loadOptions={this.getOptions}
                 getOptionValue={(option) => option.value}
                 getOptionLabel={(option) => option.label}
@@ -114,22 +119,38 @@ class SearchBar extends Component {
   };
 
   getOptions = async (input) => {
-    const data = await axios(lorem).then((res) => res.data);
+    const { typingTimeout } = this.state;
+    if (typingTimeout) clearTimeout(typingTimeout);
 
-    let options = [];
-    let obj;
-    for (let i = 0; i < data.length; i++) {
-      obj = {};
-      obj["value"] = data[i];
-      obj["label"] = data[i];
-      options.push(obj);
-    }
+    if (!input) return;
+
+    const data = await new Promise((resolve) => {
+      this.setState({
+        typingTimeout: setTimeout(() => {
+          resolve(axios(lorem).then((res) => res.data));
+        }, 1000),
+      });
+    });
+
+    const options = data.map((d) => {
+      return {
+        label: d,
+        value: d,
+      };
+    });
+
+    this.setState({ options: options });
     return options;
   };
 
-  handleInputChange = (str, { action }) => {
+  handleOnInputChange = (str, { action }) => {
+    // console.log(action);
     if (action === "input-change" || action === "set-value")
       this.setState({ searchString: str.trim() });
+  };
+
+  handleOnChange = (option, {action} ) => {
+    this.setState({ searchString: option.label });
   };
 
   handleSearch = () => {
