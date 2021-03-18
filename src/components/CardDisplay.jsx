@@ -39,7 +39,7 @@ const CardDisplay = (props) => {
   const [showModel, toggleShowModel] = useState(false);
 
   const {
-    data: { name, desc, card_images, type },
+    data: { /*name, desc,*/ card_images, type },
   } = props;
 
   const {image_url} = card_images[0];
