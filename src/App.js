@@ -11,7 +11,6 @@ function App() {
 
   return (
     <main>
-      {/* {console.log(searchResult)} */}
       <SearchBar onSuccessSearch={handleSearchData} />
       <CardGallery searchResult={searchResult} />
     </main>

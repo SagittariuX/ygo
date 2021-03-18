@@ -1,19 +1,44 @@
 
+:root{
+    --skill-card:#add8e6;
+    --spell-card: #008000;
+    --trap-card: #6d056d;
+    --normal-monster: #d4c710;
+    --effect-monster: #ffa500;
+    --link-monster: #00008b;
+    --ritual-monster: #add8e6;
+    --fusion-monster: #962ad4;
+    --xyz-monster: #1b1a1a;
+    --synchro-monster: #bebcbc;
+    --pendulum-monster: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(0,128,0,1) 0%, rgba(255,165,0,1) 100%);
+    --fusion-pendulum-monster: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(150,42,212,1) 100%);
+    --synchro-pendulum-monster: linear-gradient(0deg, rgba(0,121,128,1) 0%, rgba(190,188,188,1) 88%);
+    --xyz-pendulum-monster:linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(27,26,26,1) 81%);
+}
+
 #card-gallery{
     display: flex;
     width: 100vw;
-    min-height: 100vh;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    height: 100vh;
+    padding-top: 50px;
+    padding-bottom: 50px;
     flex-wrap: wrap;
     justify-content: center;
-    align-content: center;
-    background-color: red;
+    overflow-y: scroll;
+}
+
+#card-gallery::-webkit-scrollbar{
+    display: none;
+}
+
+#card-gallery{
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .card{
-    width: 20%;
     max-width: 200px;
+    min-width: 100px !important;
     align-self: flex-start;
     margin: 10px;
 }
@@ -21,3 +46,59 @@
 .card-title{
     text-align: center;
 }
+
+.spell-card > .modal-content{
+    background: var(--spell-card);
+}
+
+.trap-card > .modal-content{
+    background: var(--trap-card);
+}
+
+.normal-monster > .modal-content{
+    background: var(--normal-monster);
+}
+
+.effect-monster > .modal-content{
+    background: var(--effect-monster);
+}
+.ritual-monster > .modal-content{
+    background: var(--ritual-monster);
+}
+
+.fusion-monster > .modal-content{
+    background: var(--fusion-monster);
+}
+
+.link-monster > .modal-content{
+    background: var(--link-monster);
+}
+.pendulum-monster > .modal-content{
+    background: var(--pendulum-monster);
+}
+.fusion-pendulum-monster > .modal-content{
+    background: var(--fusion-pendulum-monster);
+}
+.synchro-pendulum-monster > .modal-content{
+    background: var(--synchro-pendulum-monster);
+}
+.synchro-monster > .modal-content{
+    background: var(--synchro-monster);
+}
+.xyz-monster > .modal-content{
+    background: var(--xyz-monster);
+}
+.xyz-pendulum-monster > .modal-content{
+    background: var(--xyz-pendulum-monster);
+}
+
+
+
+
+
+
+
+
+
+
+

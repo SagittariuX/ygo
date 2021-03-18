@@ -8,11 +8,11 @@ import "./SearchBar.css";
 
 const CARDTYPE = ["All", "Monster", "Spell", "Trap"];
 const SEARCHBY = {
-  "Search by Name": "fname",
+  "Search by Text": "fname",
   "Search by Exact Name": "name",
   "Search by Archtype": "archetype",
 };
-const MAX = 10;
+const MAX = 20;
 const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
@@ -21,7 +21,7 @@ const lorem = "https://random-word-api.herokuapp.com/word?number=20";
 class SearchBar extends Component {
   state = {
     searchString: "",
-    searchBy: "Search by Name",
+    searchBy: "Search by Text",
     cardType: "All",
     maxReturn: MAX,
     offset: OFFSET,
@@ -33,6 +33,7 @@ class SearchBar extends Component {
 
     //Deals with AsyncSearch bar
     typingTimeout: null,
+    value: null,
     options: null,
   };
 
@@ -67,6 +68,7 @@ class SearchBar extends Component {
               <AsyncSelect
                 placeholder="Search Here"
                 inputValue={this.state.searchString}
+                value={this.state.value}
                 onInputChange={this.handleOnInputChange}
                 onCloseResetsInput={false}
                 onChange={this.handleOnChange}
@@ -132,12 +134,14 @@ class SearchBar extends Component {
       });
     });
 
-    const options = data.map((d) => {
-      return {
-        label: d,
-        value: d,
-      };
-    });
+    const options = data
+      .filter((word) => word.toLowerCase().includes(input.toLowerCase()))
+      .map((d) => {
+        return {
+          label: d,
+          value: d,
+        };
+      });
 
     this.setState({ options: options });
     return options;
@@ -146,11 +150,14 @@ class SearchBar extends Component {
   handleOnInputChange = (str, { action }) => {
     // console.log(action);
     if (action === "input-change" || action === "set-value")
-      this.setState({ searchString: str.trim() });
+      this.setState({ searchString: str});
   };
 
-  handleOnChange = (option, {action} ) => {
-    this.setState({ searchString: option.label });
+  handleOnChange = (option, { action }) => {
+    this.setState({ 
+      searchString: option.label ,
+      value: option
+    });
   };
 
   handleSearch = () => {
@@ -165,6 +172,7 @@ class SearchBar extends Component {
     let params = {};
     if (this.state.searchString.trim())
       params[SEARCHBY[this.state.searchBy]] = this.state.searchString.trim();
+      params["desc"] = this.state.searchString.trim();
 
     if (this.state.cardType !== "All") params["type"] = this.state.cardType;
 
