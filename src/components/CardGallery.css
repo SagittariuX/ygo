@@ -42,9 +42,11 @@
     align-self: flex-start;
     margin: 10px;
 }
-
-.card-title{
-    text-align: center;
+.pagination-section{
+    width: 100%;
+    display: flex;
+    margin-top: auto;
+    justify-content: center;
 }
 
 .spell-card > .modal-content{

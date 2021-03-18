@@ -96,9 +96,9 @@ class SearchBar extends Component {
                 getOptionLabel={(option) => option.label}
                 cacheOptions
                 blurInputOnSelect={false} //set by default, but to be sure
-                //closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
+                closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
                 onKeyDown={this.handleKeyDown}
-                isHidden={false}
+                
               />
             </Col>
           </Form.Row>
@@ -141,7 +141,7 @@ class SearchBar extends Component {
   };
 
   getOptions = async (input) => {
-    const { typingTimeout, maxReturn, offset } = this.state;
+    const { typingTimeout } = this.state;
     if (typingTimeout) clearTimeout(typingTimeout);
 
     if (!input) return;
@@ -151,13 +151,12 @@ class SearchBar extends Component {
         typingTimeout: setTimeout(() => {
           resolve(
             axios(endpointCards, {
-              params: { fname: input, num: maxReturn, offset: offset },
+              params: { fname: input, num: 20, offset: 0 },
             }).then((res) => res.data)
           );
         }, 1000),
       });
     });
-    console.log(data);
     const options = data.data.map(({ name }) => {
       return {
         label: name,
@@ -170,9 +169,11 @@ class SearchBar extends Component {
   };
 
   handleOnInputChange = (str, { action }) => {
-    // console.log(action);
+    
     if (action === "input-change" || action === "set-value")
       this.setState({ searchString: str });
+    
+    return str;
   };
 
   handleOnChange = (option, { action }) => {
