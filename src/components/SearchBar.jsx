@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import "./SearchBar.css";
+import { Toast, ToastHeader, ToastBody } from "react-bootstrap";
 
 const CARDTYPE = ["All", "Monster", "Spell", "Trap"];
 const SEARCHBY = {
@@ -16,7 +17,6 @@ const MAX = 20;
 const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
-const lorem = "https://random-word-api.herokuapp.com/word?number=20";
 
 class SearchBar extends Component {
   state = {
@@ -35,6 +35,10 @@ class SearchBar extends Component {
     typingTimeout: null,
     value: null,
     options: null,
+
+    //Deals with Error toast
+    showToast: false,
+    toastMessage: "No Message",
   };
 
   render() {
@@ -62,6 +66,20 @@ class SearchBar extends Component {
             )}
           </button>
         </div>
+        <Toast
+          className="bg-danger text-white"
+          style={{ position: "absolute", top: 20, left: 20, zIndex: 100 }}
+          onClose={() => this.setState({showToast: false})}
+          show={this.state.showToast}
+          delay={3000}
+          autohide
+        >
+          <ToastHeader className="bg-danger text-white">
+            <strong>Error</strong>
+          </ToastHeader>
+          <ToastBody>{this.state.toastMessage}</ToastBody>
+        </Toast>
+
         <Form onSubmit={(e) => console.log(e)}>
           <Form.Row>
             <Col>
@@ -78,7 +96,9 @@ class SearchBar extends Component {
                 getOptionLabel={(option) => option.label}
                 cacheOptions
                 blurInputOnSelect={false} //set by default, but to be sure
-                closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
+                //closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
+                onKeyDown={this.handleKeyDown}
+                isHidden={false}
               />
             </Col>
           </Form.Row>
@@ -121,7 +141,7 @@ class SearchBar extends Component {
   };
 
   getOptions = async (input) => {
-    const { typingTimeout } = this.state;
+    const { typingTimeout, maxReturn, offset } = this.state;
     if (typingTimeout) clearTimeout(typingTimeout);
 
     if (!input) return;
@@ -129,20 +149,22 @@ class SearchBar extends Component {
     const data = await new Promise((resolve) => {
       this.setState({
         typingTimeout: setTimeout(() => {
-          resolve(axios(lorem).then((res) => res.data));
+          resolve(
+            axios(endpointCards, {
+              params: { fname: input, num: maxReturn, offset: offset },
+            }).then((res) => res.data)
+          );
         }, 1000),
       });
     });
-
-    const options = data
-      .filter((word) => word.toLowerCase().includes(input.toLowerCase()))
-      .map((d) => {
-        return {
-          label: d,
-          value: d,
-        };
-      });
-
+    console.log(data);
+    const options = data.data.map(({ name }) => {
+      return {
+        label: name,
+        value: name,
+      };
+    });
+    // .filter((word) => word.toLowerCase().includes(input.toLowerCase()))
     this.setState({ options: options });
     return options;
   };
@@ -150,29 +172,41 @@ class SearchBar extends Component {
   handleOnInputChange = (str, { action }) => {
     // console.log(action);
     if (action === "input-change" || action === "set-value")
-      this.setState({ searchString: str});
+      this.setState({ searchString: str });
   };
 
   handleOnChange = (option, { action }) => {
-    this.setState({ 
-      searchString: option.label ,
-      value: option
+    this.setState({
+      searchString: option.label,
+      value: option,
     });
+  };
+
+  handleKeyDown = (e) => {
+    if (e.key === "Enter") e.preventDefault();
   };
 
   handleSearch = () => {
     const { onSuccessSearch } = this.props;
     axios
       .get(endpointCards, { params: this.buildParam() })
-      .then((res) => onSuccessSearch(res.data))
-      .catch((error) => console.log(error.response.data)); //make toast messages later
+      .then((res) => {
+        onSuccessSearch(res.data);
+        this.handleHiddenToggle();
+      })
+      .catch(err => {
+        this.setState({
+          showToast: true,
+          toastMessage: err.response.data.error
+        });
+      }); //make toast messages later
   };
 
   buildParam = () => {
     let params = {};
     if (this.state.searchString.trim())
       params[SEARCHBY[this.state.searchBy]] = this.state.searchString.trim();
-      params["desc"] = this.state.searchString.trim();
+    params["desc"] = this.state.searchString.trim();
 
     if (this.state.cardType !== "All") params["type"] = this.state.cardType;
 
