@@ -37,7 +37,9 @@ function CardGallery(props) {
   const buildPaginationBar = (length) => {
     let pages = [];
     let count = 1;
+    console.log(length);
     do {
+      console.log(count);
       pages.push(
         <PageItem
           active={count === page}
@@ -48,8 +50,7 @@ function CardGallery(props) {
           {count}
         </PageItem>
       );
-      count++;
-    } while (count * MAXPAGEDISPLAY <= length + 1);
+    } while (count++ * MAXPAGEDISPLAY < length);
     return pages;
   };
 
