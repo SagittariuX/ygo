@@ -11,24 +11,54 @@ function CardGallery(props) {
   const [results, setResults] = useState(data);
   const [page, setPage] = useState(1);
 
-  const MAXPAGEDISPLAY = 2;
+  const MAXPAGEDISPLAY = 30;
 
   useEffect(() => {
     setResults(data);
+    setPage(1);
   }, [data]);
+
+  useEffect(() => {
+  }, [page]);
+
+  const handlePageClick = (e) => {
+    setPage(Number(e.target.name));
+  };
+
+  const buildDisplayCardList = () => {
+    return results
+      .filter(
+        (item, index) =>
+          index >= MAXPAGEDISPLAY * (page - 1) && index < page * MAXPAGEDISPLAY
+      )
+      .map((item, index) => <CardDisplay data={item} key={index} />);
+  };
+
+  const buildPaginationBar = (length) => {
+    let pages = [];
+    let count = 1;
+    do {
+      pages.push(
+        <PageItem
+          active={count === page}
+          key={count}
+          name={count}
+          onClick={count === page ? null : handlePageClick}
+        >
+          {count}
+        </PageItem>
+      );
+      count++;
+    } while (count * MAXPAGEDISPLAY <= length + 1);
+    return pages;
+  };
 
   if (results) {
     return (
       <div id="card-gallery" className="container-xl">
-        {results.map((item, index) => (
-          <CardDisplay data={item} key={index} />
-        ))}
+        {buildDisplayCardList()}
         <div className="pagination-section">
-          <Pagination>
-            <PageItem onClick={(e) => console.log(e)}>1</PageItem>
-            <PageItem>2</PageItem>
-            <PageItem>3</PageItem>
-          </Pagination>
+          <Pagination>{buildPaginationBar(results.length)}</Pagination>
         </div>
       </div>
     );

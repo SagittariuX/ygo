@@ -13,7 +13,7 @@ const SEARCHBY = {
   "Search by Exact Name": "name",
   "Search by Archtype": "archetype",
 };
-const MAX = 20;
+const MAX = 500;
 const OFFSET = 0;
 
 const endpointCards = process.env.REACT_APP_YGO_DB_CARDS;
@@ -69,7 +69,7 @@ class SearchBar extends Component {
         <Toast
           className="bg-danger text-white"
           style={{ position: "absolute", top: 20, left: 20, zIndex: 100 }}
-          onClose={() => this.setState({showToast: false})}
+          onClose={() => this.setState({ showToast: false })}
           show={this.state.showToast}
           delay={3000}
           autohide
@@ -98,7 +98,6 @@ class SearchBar extends Component {
                 blurInputOnSelect={false} //set by default, but to be sure
                 closeMenuOnSelect={false} //prevents menu close after select, which would also result in input blur
                 onKeyDown={this.handleKeyDown}
-                
               />
             </Col>
           </Form.Row>
@@ -169,10 +168,9 @@ class SearchBar extends Component {
   };
 
   handleOnInputChange = (str, { action }) => {
-    
     if (action === "input-change" || action === "set-value")
       this.setState({ searchString: str });
-    
+
     return str;
   };
 
@@ -195,10 +193,10 @@ class SearchBar extends Component {
         onSuccessSearch(res.data);
         this.handleHiddenToggle();
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({
           showToast: true,
-          toastMessage: err.response.data.error
+          toastMessage: err.response.data.error,
         });
       }); //make toast messages later
   };
